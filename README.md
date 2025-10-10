@@ -34,7 +34,7 @@ Would you like to join our community server?
 3. Once installed, open Chevstrap and begin using it.
 
 ## Requirement
-- A Clone App (make sure it's trusted)
+- A Virtual app (make sure it's trusted)
 - A Roblox installed
 - Android version 9 or higher
 
@@ -54,4 +54,5 @@ A: It was planned from the beginning, but was canceled for safety reasons.
 
 #### Q: "Roblox logs folder not found"
 A: That means no notification appeared.
+
 
