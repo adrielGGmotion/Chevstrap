@@ -61,6 +61,6 @@ body:
   - type: input
     id: clone-app
     attributes:
-      label: Are you using a clone app?
+      label: Are you running chevstrap with virtual app?
       description: If you're running Chevstrap inside a clone app, name it here. Otherwise, write "N/A" or "No".
       placeholder: "N/A"
