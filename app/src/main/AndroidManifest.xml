@@ -20,7 +20,7 @@
 		android:label="Chevstrap"
 		android:requestLegacyExternalStorage="true"
 		android:usesCleartextTraffic="true"
-		android:theme="@style/AppTheme">
+		android:theme="@style/Theme.Chevstrap">
 
 		<!-- Main Activity -->
 		<activity
@@ -28,7 +28,7 @@
 			android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
 			android:hardwareAccelerated="true"
 			android:supportsPictureInPicture="true"
-			android:theme="@style/AppTheme.NoActionBar"
+			android:theme="@style/Theme.Chevstrap"
 			android:windowSoftInputMode="stateHidden"
 			android:exported="true">
 			<intent-filter>
@@ -43,7 +43,7 @@
 			android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
 			android:hardwareAccelerated="true"
 			android:supportsPictureInPicture="true"
-			android:theme="@style/AppTheme.FullScreen"
+			android:theme="@style/Theme.Chevstrap"
 			android:windowSoftInputMode="stateHidden" />
 
 		<!-- Optional Apache HTTP Legacy Library -->

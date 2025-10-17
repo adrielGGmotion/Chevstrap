@@ -453,17 +453,8 @@ public class AddNewFFlagFragment extends DialogFragment {
 			buttonResult.editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 			buttonResult.editText.setSingleLine(false);
 
-			buttonResult.linearTextbox.setLayoutParams(params1);
-			buttonResult.editText.setLayoutParams(params2);
-
-			buttonResult.linearTextbox.setGravity(Gravity.TOP);
+			buttonResult.editText.setLayoutParams(params1);
 			buttonResult.editText.setGravity(Gravity.TOP);
-
-			int paddingTopBottomDp = 7;
-			float scale = requireContext().getResources().getDisplayMetrics().density;
-			int paddingPx = (int) (paddingTopBottomDp * scale + 0.5f);
-
-			buttonResult.linearTextbox.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
 
 		}
 		return buttonResult.editText;
