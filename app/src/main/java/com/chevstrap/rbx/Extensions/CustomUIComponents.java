@@ -60,19 +60,21 @@ public class CustomUIComponents {
     public static class TextboxOnlyResult {
         public final View textboxView;
         public final EditText editText;
-        public TextboxOnlyResult(View textboxView, EditText editText) {
+        public final LinearLayout linearTextbox;
+        public TextboxOnlyResult(View textboxView, LinearLayout linearTextbox, EditText editText) {
             this.textboxView = textboxView;
+            this.linearTextbox = linearTextbox;
             this.editText = editText;
         }
     }
 
     public static class DropdownResult {
         public final View dropDownView;
-        public final android.widget.AutoCompleteTextView spinner;
+        public final Spinner spinner;
         public final ArrayAdapter<String> adapter;
         public final TextView nameTextView;
 
-        public DropdownResult(View dropDownView, android.widget.AutoCompleteTextView spinner, ArrayAdapter<String> adapter, TextView nameTextView) {
+        public DropdownResult(View dropDownView, Spinner spinner, ArrayAdapter<String> adapter, TextView nameTextView) {
             this.dropDownView = dropDownView;
             this.spinner = spinner;
             this.adapter = adapter;
@@ -82,10 +84,10 @@ public class CustomUIComponents {
 
     public static class ToggleResult {
         public final View toggleView;
-        public final com.google.android.material.switchmaterial.SwitchMaterial toggleSwitch;
+        public final ImageView toggleSwitch;
         public final TextView nameTextView;
 
-        public ToggleResult(View toggleView, com.google.android.material.switchmaterial.SwitchMaterial toggleSwitch, TextView nameTextView) {
+        public ToggleResult(View toggleView, ImageView toggleSwitch, TextView nameTextView) {
             this.toggleView = toggleView;
             this.toggleSwitch = toggleSwitch;
             this.nameTextView = nameTextView;
@@ -212,6 +214,8 @@ public class CustomUIComponents {
         TextView nameView = textboxView.findViewById(R.id.textview_name_option);
         TextView descView = textboxView.findViewById(R.id.textview_iswhatda);
 
+        AstyleButton1(container);
+        StyleTextbox(linearTextbox);
         nameView.setText(name);
         descView.setText(description);
 
@@ -279,11 +283,39 @@ public class CustomUIComponents {
         LayoutInflater inflater = LayoutInflater.from(context);
         View textboxView = inflater.inflate(R.layout.custom_the_textbox, parent, false);
 
-        com.google.android.material.textfield.TextInputEditText input = textboxView.findViewById(R.id.edittext1);
+        EditText input = textboxView.findViewById(R.id.edittext1);
+        LinearLayout linearTextbox = textboxView.findViewById(R.id.linear1);
+        ImageView imageview1 = textboxView.findViewById(R.id.imageview1);
+        StyleTextbox(linearTextbox);
+
+        if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "light")) {
+            imageview1.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+        } else if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "dark")) {
+            imageview1.clearColorFilter();
+        }
+
+        if (imageResId != 0) {
+            int sizeInPx = (int) (25 * context.getResources().getDisplayMetrics().density);
+            ViewGroup.LayoutParams params = imageview1.getLayoutParams();
+            params.width = sizeInPx;
+            params.height = sizeInPx;
+            imageview1.setLayoutParams(params);
+            imageview1.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+            imageview1.setImageResource(imageResId);
+            imageview1.setVisibility(View.VISIBLE);
+        } else {
+            imageview1.setVisibility(View.GONE);
+        }
 
         input.setHint(placeholderText);
+        if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "light")) {
+            input.setTextColor(Color.parseColor("#000000"));
+        } else if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "dark")) {
+            input.setTextColor(Color.parseColor("#FFFFFF"));
+        }
         input.setInputType(InputType.TYPE_CLASS_TEXT);
-        return new TextboxOnlyResult(textboxView, input);
+        return new TextboxOnlyResult(textboxView, linearTextbox, input);
     }
 
     public static DropdownResult addDropdown(Context context, String name, String description, LinearLayout parent, final JSONArray jsonArray, MethodPair selectedMethod) {
@@ -293,10 +325,12 @@ public class CustomUIComponents {
         View dropDownView = inflater.inflate(R.layout.dropdown_advanced, parent, false);
 
         LinearLayout container = dropDownView.findViewById(R.id.linear_hey);
-        android.widget.AutoCompleteTextView spinner = dropDownView.findViewById(R.id.spinnercustom);
+        Spinner spinner = dropDownView.findViewById(R.id.spinnercustom);
         TextView nameView = dropDownView.findViewById(R.id.textview_name_option);
         TextView descView = dropDownView.findViewById(R.id.textview_iswhatda);
 
+        AstyleButton1(container);
+        StyleDropdown(spinner);
         nameView.setText(name);
         descView.setText(description);
 
@@ -304,13 +338,57 @@ public class CustomUIComponents {
             descView.setVisibility(View.GONE);
         }
 
+        GradientDrawable popupBg = new GradientDrawable();
+        if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "light")) {
+            nameView.setTextColor(Color.parseColor("#000000"));
+            descView.setTextColor(Color.parseColor("#545454"));
+
+            popupBg.setColor(Color.parseColor("#FFFFFF"));
+        } else if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "dark")) {
+            nameView.setTextColor(Color.parseColor("#FFFFFF"));
+            descView.setTextColor(Color.parseColor("#ABABAB"));
+
+            popupBg.setColor(Color.parseColor("#070707"));
+        }
+        popupBg.setShape(GradientDrawable.RECTANGLE);
+        popupBg.setCornerRadius(20f);
+
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 labels.add(jsonArray.getJSONObject(i).getString("label"));
             } catch (JSONException ignored) { }
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, labels);
+        spinner.setPopupBackgroundDrawable(popupBg);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(context, R.layout.custom_dropdown, R.id.textview1, labels) {
+            @NonNull
+            @Override
+            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView tv = view.findViewById(R.id.textview1);
+
+                if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "light")) {
+                    tv.setTextColor(Color.parseColor("#000000"));
+                } else if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "dark")) {
+                    tv.setTextColor(Color.parseColor("#FFFFFF"));
+                }
+                return view;
+            }
+
+            @NonNull
+            @Override
+            public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView tv = view.findViewById(R.id.textview1);
+
+                if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "light")) {
+                    tv.setTextColor(Color.parseColor("#000000"));
+                } else if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "dark")) {
+                    tv.setTextColor(Color.parseColor("#FFFFFF"));
+                }
+                return view;
+            }
+        };
         spinner.setAdapter(adapter);
 
         Class<?> clazz = selectedMethod.getMethod.getDeclaringClass();
@@ -339,28 +417,38 @@ public class CustomUIComponents {
             }
         }
 
+        int index = -1;
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 JSONObject obj = jsonArray.getJSONObject(i);
                 assert TargetSelected != null;
                 if (TargetSelected.equals(obj.getString("value"))) {
                     String label = obj.getString("label");
-                    spinner.setText(label, false);
+                    index = adapter.getPosition(label);
                     break;
                 }
             } catch (JSONException ignored) { }
         }
 
-        spinner.setOnItemClickListener((parentView, view, position, id) -> {
-            try {
-                JSONObject selected = jsonArray.getJSONObject(position);
-                String value = selected.optString("value");
-                selectedMethod.setMethod.invoke(viewModel, value);
+        if (index >= 0) {
+            spinner.setSelection(index);
+        }
 
-            } catch (JSONException ignored) {
-            } catch (Exception e) {
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View view, int position, long id) {
+                try {
+                    JSONObject selected = jsonArray.getJSONObject(position);
+                    String value = selected.optString("value");
+                    selectedMethod.setMethod.invoke(viewModel, value);
+
+                } catch (JSONException ignored) {
+                } catch (Exception e) {
 //					e.printStackTrace();
+                }
             }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
         });
 
         return new DropdownResult(dropDownView, spinner, adapter, nameView);
@@ -377,14 +465,25 @@ public class CustomUIComponents {
             throw new RuntimeException(e);
         }
 
+        final boolean[] toggleState = {false};
+
         LayoutInflater inflater = LayoutInflater.from(context);
         View toggleView = inflater.inflate(R.layout.toggle_advanced, parent, false);
 
         LinearLayout container = toggleView.findViewById(R.id.linear_hey);
-        com.google.android.material.switchmaterial.SwitchMaterial toggleSwitch = toggleView.findViewById(R.id.imageview_switch);
+        ImageView toggleSwitch = toggleView.findViewById(R.id.imageview_switch);
         TextView nameView = toggleView.findViewById(R.id.textview_name_option);
         TextView descView = toggleView.findViewById(R.id.textview_iswhatda);
 
+        if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "light")) {
+            nameView.setTextColor(Color.parseColor("#000000"));
+            descView.setTextColor(Color.parseColor("#545454"));
+        } else if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "dark")) {
+            nameView.setTextColor(Color.parseColor("#FFFFFF"));
+            descView.setTextColor(Color.parseColor("#ABABAB"));
+        }
+
+        AstyleButton1(container);
         nameView.setText(name);
         descView.setText(description);
 
@@ -403,11 +502,23 @@ public class CustomUIComponents {
 //			e.printStackTrace();
         }
 
-        toggleSwitch.setChecked(lastStatusToggle);
+        toggleState[0] = lastStatusToggle;
+        if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "light")) {
+            toggleSwitch.setBackgroundResource(toggleState[0] ? R.drawable.toggle_on_light : R.drawable.toggle_off_light);
+        } else {
+            toggleSwitch.setBackgroundResource(toggleState[0] ? R.drawable.toggle_on : R.drawable.toggle_off);
+        }
 
-        toggleSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        toggleSwitch.setOnClickListener(v -> {
+            toggleState[0] = !toggleState[0];
+
+            if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "light")) {
+                toggleSwitch.setBackgroundResource(toggleState[0] ? R.drawable.toggle_on_light : R.drawable.toggle_off_light);
+            } else {
+                toggleSwitch.setBackgroundResource(toggleState[0] ? R.drawable.toggle_on : R.drawable.toggle_off);
+            }
             try {
-                selectedMethod.setMethod.invoke(instance, isChecked);
+                selectedMethod.setMethod.invoke(instance, toggleState[0]);
             } catch (Exception e) {
 //				e.printStackTrace();
             }
@@ -423,6 +534,7 @@ public class CustomUIComponents {
         TextView nameView = buttonView.findViewById(R.id.textview_name_option);
         TextView descView = buttonView.findViewById(R.id.textview_iswhatda);
 
+        AstyleButton1(container);
         nameView.setText(name);
         descView.setText(description);
 
@@ -458,6 +570,7 @@ public class CustomUIComponents {
         TextView descView = buttonView.findViewById(R.id.textview_iswhatda);
         ImageView imageview_button = buttonView.findViewById(R.id.imageview_button);
 
+        AstyleButton1(container);
         nameView.setText(name);
         descView.setText(description);
 
@@ -578,7 +691,81 @@ public class CustomUIComponents {
         return new SmallButtonResult(buttonView, container, nameView, THEimageView);
     }
 
+    public static void AstyleButton1(LinearLayout button) {
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setCornerRadius(30);
+        if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "dark")) {
+            drawable.setColor(Color.parseColor("#1B1B1B"));
+            drawable.setStroke(2, Color.parseColor("#070707"));
+        } else if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "light")) {
+            drawable.setColor(Color.parseColor("#F0F3F5"));
+            drawable.setStroke(2, Color.parseColor("#EAEDEF"));
+        }
+        button.setBackground(drawable);
+    }
 
+    public static void StyleDropdown(Spinner spinner) {
+        spinner.post(() -> spinner.setBackground(buildSpinnerBackground(spinner)));
+    }
 
+    private static Drawable buildSpinnerBackground(Spinner spinner) {
+        GradientDrawable gradient = new GradientDrawable();
+        gradient.setCornerRadius(30);
+
+        boolean isDark = Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "dark");
+
+        if (isDark) {
+            gradient.setColor(Color.parseColor("#262626"));
+            gradient.setStroke(2, Color.parseColor("#252525"));
+        } else {
+            gradient.setStroke(2, Color.parseColor("#DADADA"));
+            gradient.setColor(Color.parseColor("#FFFFFF"));
+        }
+
+        Drawable arrow = ContextCompat.getDrawable(spinner.getContext(), R.drawable.arrow_down);
+        if (arrow != null) {
+            int arrowColor = isDark ? Color.parseColor("#FFFFFF") : Color.parseColor("#000000");
+
+            arrow.setTint(arrowColor);
+            return buildLayerDrawable(spinner, gradient, arrow);
+        }
+
+        return gradient;
+    }
+
+    private static LayerDrawable buildLayerDrawable(Spinner spinner, Drawable background, Drawable arrow) {
+        int arrowSize = (int) (arrow.getIntrinsicWidth() * 0.05);
+        int rightPadding = 25;
+
+        LayerDrawable layerDrawable = new LayerDrawable(new Drawable[]{background, arrow});
+        layerDrawable.setLayerInset(0, 0, 0, 0, 0);
+        layerDrawable.setLayerInset(
+                1,
+                spinner.getWidth() - arrowSize - rightPadding,
+                (spinner.getHeight() - arrowSize) / 2,
+                rightPadding,
+                (spinner.getHeight() - arrowSize) / 2
+        );
+        return layerDrawable;
+    }
+
+    public static void StyleTextbox(LinearLayout textbox) {
+        GradientDrawable normal = new GradientDrawable();
+        normal.setCornerRadius(20);
+
+        if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "dark")) {
+            normal.setColor(Color.parseColor("#101010"));
+            normal.setStroke(2, Color.parseColor("#202020"));
+        } else if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "light")) {
+            normal.setColor(Color.parseColor("#FFFFFF"));
+            normal.setStroke(2, Color.parseColor("#DFDFDF"));
+        }
+
+        StateListDrawable states = new StateListDrawable();
+        states.addState(new int[]{android.R.attr.state_enabled}, normal);
+        states.addState(new int[]{}, normal);
+
+        textbox.setBackground(states);
+    }
 
 }

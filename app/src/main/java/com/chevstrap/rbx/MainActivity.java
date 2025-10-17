@@ -54,29 +54,25 @@ public class MainActivity extends AppCompatActivity {
 		linear5.addView(buttonWiki.buttonView);
         textview_version = findViewById(R.id.textview_version);
 
-		if (buttonLaunchrbx.buttonOne != null) {
-			buttonLaunchrbx.buttonOne.setOnClickListener(v -> {
-				Launcher launcher = new Launcher();
-				launcher.setFragmentManager(getSupportFragmentManager());
-				try {
-					launcher.Run();
-				} catch (Exception e) {
-					Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-				}
-			});
-		}
+		buttonLaunchrbx.buttonOne.setOnClickListener(v -> {
+			Launcher launcher = new Launcher();
+			launcher.setFragmentManager(getSupportFragmentManager());
+			try {
+				launcher.Run();
+			} catch (Exception e) {
+				Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+			}
+		});
 
-		if (buttonConfiguresettings.buttonOne != null) {
-			buttonConfiguresettings.buttonOne.setOnClickListener(v -> {
-				try {
-					Intent intent = new Intent(this, SettingsActivity.class);
-					startActivity(intent);
-					finish();
-				} catch (Exception e) {
-					Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-				}
-			});
-		}
+		buttonConfiguresettings.buttonOne.setOnClickListener(v -> {
+			try {
+				Intent intent = new Intent(this, SettingsActivity.class);
+				startActivity(intent);
+				finish();
+			} catch (Exception e) {
+				Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+			}
+		});
 	}
 
 	private void initializeLogic() {

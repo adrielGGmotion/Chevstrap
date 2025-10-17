@@ -57,11 +57,13 @@
 			android:gravity="end"
 			android:paddingStart="0dp"
 			android:paddingEnd="15dp">
-				<com.google.android.material.switchmaterial.SwitchMaterial
+				<ImageView
 					android:id="@+id/imageview_switch"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					/>
+					android:layout_width="40dp"
+					android:layout_height="40dp"
+					android:background="@drawable/toggle_off"
+					android:src="@drawable/nothing80"
+					android:scaleType="center" />
 		</LinearLayout>
 	</LinearLayout>
 </LinearLayout>

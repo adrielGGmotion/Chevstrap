@@ -10,25 +10,4 @@
 	android:textColor="@color/button_tint"
 	android:orientation="vertical"
 	android:paddingTop="15dp"
-	android:paddingBottom="15dp">
-
-	<ImageView
-		android:id="@+id/imageview"
-		android:layout_width="25dp"
-		android:layout_height="25dp"
-		android:background="@drawable/integrations"
-		android:clickable="false"
-		android:focusable="false"
-		android:scaleType="center"
-		android:src="@drawable/nothing80" />
-
-	<TextView
-		android:id="@+id/textview_name"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:clickable="false"
-		android:focusable="false"
-		android:padding="1dp"
-		android:text=""
-		android:textSize="12sp" />
-</com.google.android.material.button.MaterialButton>
+	android:paddingBottom="15dp" />
