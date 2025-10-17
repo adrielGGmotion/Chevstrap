@@ -2,15 +2,11 @@ package com.chevstrap.rbx;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.os.*;
 import android.util.*;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
@@ -89,12 +85,12 @@ public class SettingsActivity extends AppCompatActivity {
 		installer.HandleUpgrades();
 
 
-		addButton(this, getTextLocale(App.getAppContext(), R.string.menu_integrations_title), R.drawable.integrations, R.drawable.integrations_on, R.drawable.integrations_light, "Integrations", toggleGroup);
-		addButton(this, getTextLocale(App.getAppContext(), R.string.menu_fastflags_title), R.drawable.fastflag_icon, R.drawable.fastflag_icon_on, R.drawable.fastflag_icon_light, "Flags Settings", toggleGroup);
-		addButton(this, getTextLocale(App.getAppContext(), R.string.menu_fastflageditor_title), R.drawable.editor_icon, R.drawable.editor_icon_on, R.drawable.editor_icon_light,  "Flags Editor", toggleGroup);
-		addButton(this, getTextLocale(App.getAppContext(), R.string.menu_behaviour_title), R.drawable.bootstrapper_icon, R.drawable.bootstrapper_icon_on, R.drawable.bootstrapper_icon_light,  "Launcher", toggleGroup);
-		addButton(this, "Chevstrap", R.drawable.setting_icon, R.drawable.setting_icon_on, R.drawable.setting_icon_light, "Settings", toggleGroup);
-		addButton(this, getTextLocale(App.getAppContext(), R.string.about_title), R.drawable.about_icon, R.drawable.about_icon_on, R.drawable.about_icon_light, "About", toggleGroup);
+		addButton(this, getTextLocale(App.getAppContext(), R.string.menu_integrations_title), "Integrations", toggleGroup);
+		addButton(this, getTextLocale(App.getAppContext(), R.string.menu_fastflags_title), "Flags Settings", toggleGroup);
+		addButton(this, getTextLocale(App.getAppContext(), R.string.menu_fastflageditor_title), "Flags Editor", toggleGroup);
+		addButton(this, getTextLocale(App.getAppContext(), R.string.menu_behaviour_title), "Launcher", toggleGroup);
+		addButton(this, "Chevstrap", "Settings", toggleGroup);
+		addButton(this, getTextLocale(App.getAppContext(), R.string.about_title), "About", toggleGroup);
 
 		button_close.setOnClickListener(_view -> {
 			showMessageBoxUnsavedChanges();
@@ -120,41 +116,10 @@ public class SettingsActivity extends AppCompatActivity {
 		movePage("Flags Settings");
 	}
 
-	public static void addDivider(Context context, LinearLayout parent) {
-		View divider = new View(context);
-
-		int heightPx = (int) (1 * context.getResources().getDisplayMetrics().density + 0.5f);
-		LinearLayout.LayoutParams layoutParams = getLayoutParams(context, heightPx);
-		divider.setLayoutParams(layoutParams);
-
-		if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "light")) {
-			divider.setBackgroundColor(Color.parseColor("#BCC9D3"));
-		} else if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "dark")) {
-			divider.setBackgroundColor(Color.parseColor("#323232"));
-		}
-		parent.addView(divider);
-	}
-
-	private static LinearLayout.LayoutParams getLayoutParams(Context context, int heightPx) {
-		int marginLeft = (int) (10 * context.getResources().getDisplayMetrics().density + 0.5f);
-		int marginTop = (int) (10 * context.getResources().getDisplayMetrics().density + 0.5f);
-		int marginRight = (int) (10 * context.getResources().getDisplayMetrics().density + 0.5f);
-		int marginBottom = (int) (10 * context.getResources().getDisplayMetrics().density + 0.5f);
-
-		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.MATCH_PARENT,
-				heightPx
-		);
-		layoutParams.setMargins(marginLeft, marginTop, marginRight, marginBottom);
-		return layoutParams;
-	}
-
-	public void addButton(Context context, String name, int IconResId, int IconResId1, int IconResId_light, String MovePageTo, com.google.android.material.button.MaterialButtonToggleGroup parent) {
-		LayoutInflater inflater = LayoutInflater.from(context);
-		com.google.android.material.button.MaterialButton buttonView = (com.google.android.material.button.MaterialButton) inflater.inflate(R.layout.button_menu_settingspage, parent, false);
+	public void addButton(Context context, String name, String MovePageTo, com.google.android.material.button.MaterialButtonToggleGroup parent) {
+		com.google.android.material.button.MaterialButton buttonView = (com.google.android.material.button.MaterialButton) LayoutInflater.from(context).inflate(R.layout.button_menu_settingspage, parent, false);
 
 		buttonView.setText(name);
-		buttonView.setIconResource(IconResId);
 		buttonView.setOnClickListener(v -> {
 			movePage(MovePageTo);
 		});

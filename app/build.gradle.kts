@@ -42,4 +42,5 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(libs.okhttp)
+    implementation("com.google.android.material:material:1.12.0")
 }
