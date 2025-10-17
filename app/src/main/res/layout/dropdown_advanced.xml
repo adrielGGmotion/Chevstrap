@@ -46,16 +46,19 @@
 				android:textSize="11sp"
 				android:textColor="#E0E0E0" />
 		</LinearLayout>
-		<Spinner
-			android:id="@+id/spinnercustom"
+		<com.google.android.material.textfield.TextInputLayout
 			android:layout_width="0dp"
-			android:layout_height="35dp"
+			android:layout_height="wrap_content"
 			android:layout_weight="1"
-			android:background="#263238"
-		    android:padding="5dp"
-		    android:gravity="end"
-			android:dropDownVerticalOffset="35dp"
-			android:spinnerMode="dropdown" />
+			style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+
+			<AutoCompleteTextView
+				android:id="@+id/spinnercustom"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:inputType="none" />
+
+		</com.google.android.material.textfield.TextInputLayout>
 
 	</LinearLayout>
 </LinearLayout>

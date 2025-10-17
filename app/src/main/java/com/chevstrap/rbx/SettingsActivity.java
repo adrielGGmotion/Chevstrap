@@ -39,12 +39,12 @@ import org.json.JSONObject;
 
 public class SettingsActivity extends AppCompatActivity {
 	private String currentPage = null;
-    private LinearLayout linear20;
     private TextView textview5;
-	private LinearLayout button_save;
-	private LinearLayout button_saveandlaunch;
-    private LinearLayout button_close;
+	private com.google.android.material.button.MaterialButton button_save;
+	private com.google.android.material.button.MaterialButton button_saveandlaunch;
+    private com.google.android.material.button.MaterialButton button_close;
 	private final List<ButtonClickListener> buttonClickListener = new ArrayList<>();
+    private LinearLayout linear20;
 
 	private interface ButtonClickListener {
 		void onQueryChanged(String query);
@@ -78,62 +78,23 @@ public class SettingsActivity extends AppCompatActivity {
 	}
 
 	private void initialize() {
-        LinearLayout linear1 = findViewById(R.id.linear1);
-        LinearLayout linear_dark = findViewById(R.id.linear_dark);
-        LinearLayout linear_background = findViewById(R.id.linear_background);
-
-        LinearLayout linear24 = findViewById(R.id.linear24);
-        LinearLayout linear024 = findViewById(R.id.linear024);
-        LinearLayout linear3 = findViewById(R.id.linear3);
-        LinearLayout linear25 = findViewById(R.id.linear25);
-        LinearLayout linear22 = findViewById(R.id.linear22);
-        LinearLayout linear27 = findViewById(R.id.linear27);
-        LinearLayout linear10 = findViewById(R.id.linear10);
-        TextView textview1 = findViewById(R.id.textview1);
-        ScrollView vscroll1 = findViewById(R.id.vscroll1);
-
-        LinearLayout linear26 = findViewById(R.id.linear26);
-		linear20 = findViewById(R.id.linear20);
-        TextView textview3 = findViewById(R.id.textview3);
 		textview5 = findViewById(R.id.textview5);
 		button_save = findViewById(R.id.button_save);
 		button_saveandlaunch = findViewById(R.id.button_saveandlaunch);
 		button_close = findViewById(R.id.button_close);
+        com.google.android.material.button.MaterialButtonToggleGroup toggleGroup = findViewById(R.id.toggle_group);
+        linear20 = findViewById(R.id.linear20);
 
 		Installer installer = new Installer();
 		installer.HandleUpgrades();
 
-		GradientDrawable activeBg = new GradientDrawable();
-		activeBg.setCornerRadius(20);
 
-		if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "dark")) {
-			activeBg.setColor(Color.parseColor("#101010"));
-			activeBg.setStroke(2, Color.parseColor("#181818"));
-			linear_background.setBackgroundResource(R.drawable.background_normal);
-		} else if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "light")) {
-			linear_background.setBackgroundResource(R.drawable.background_light);
-			activeBg.setStroke(2, Color.parseColor("#E3E8EC"));
-			activeBg.setColor(Color.parseColor("#FFFFFF"));
-		}
-
-		linear_dark.setBackground(activeBg);
-		if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "light")) {
-			textview5.setTextColor(Color.parseColor("#000000"));
-			textview1.setTextColor(Color.parseColor("#000000"));
-			linear024.setBackgroundColor(Color.parseColor("#E3E8EC"));
-		} else if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "dark")) {
-			textview5.setTextColor(Color.parseColor("#FFFFFF"));
-			textview1.setTextColor(Color.parseColor("#FFFFFF"));
-			linear024.setBackgroundColor(Color.parseColor("#181818"));
-		}
-
-		addButton(this, getTextLocale(App.getAppContext(), R.string.menu_integrations_title), R.drawable.integrations, R.drawable.integrations_on, R.drawable.integrations_light, "Integrations", linear27);
-		addButton(this, getTextLocale(App.getAppContext(), R.string.menu_fastflags_title), R.drawable.fastflag_icon, R.drawable.fastflag_icon_on, R.drawable.fastflag_icon_light, "Flags Settings", linear27);
-		addButton(this, getTextLocale(App.getAppContext(), R.string.menu_fastflageditor_title), R.drawable.editor_icon, R.drawable.editor_icon_on, R.drawable.editor_icon_light,  "Flags Editor", linear27);
-		addButton(this, getTextLocale(App.getAppContext(), R.string.menu_behaviour_title), R.drawable.bootstrapper_icon, R.drawable.bootstrapper_icon_on, R.drawable.bootstrapper_icon_light,  "Launcher", linear27);
-		addDivider(this, linear27);
-		addButton(this, "Chevstrap", R.drawable.setting_icon, R.drawable.setting_icon_on, R.drawable.setting_icon_light, "Settings", linear27);
-		addButton(this, getTextLocale(App.getAppContext(), R.string.about_title), R.drawable.about_icon, R.drawable.about_icon_on, R.drawable.about_icon_light, "About", linear27);
+		addButton(this, getTextLocale(App.getAppContext(), R.string.menu_integrations_title), R.drawable.integrations, R.drawable.integrations_on, R.drawable.integrations_light, "Integrations", toggleGroup);
+		addButton(this, getTextLocale(App.getAppContext(), R.string.menu_fastflags_title), R.drawable.fastflag_icon, R.drawable.fastflag_icon_on, R.drawable.fastflag_icon_light, "Flags Settings", toggleGroup);
+		addButton(this, getTextLocale(App.getAppContext(), R.string.menu_fastflageditor_title), R.drawable.editor_icon, R.drawable.editor_icon_on, R.drawable.editor_icon_light,  "Flags Editor", toggleGroup);
+		addButton(this, getTextLocale(App.getAppContext(), R.string.menu_behaviour_title), R.drawable.bootstrapper_icon, R.drawable.bootstrapper_icon_on, R.drawable.bootstrapper_icon_light,  "Launcher", toggleGroup);
+		addButton(this, "Chevstrap", R.drawable.setting_icon, R.drawable.setting_icon_on, R.drawable.setting_icon_light, "Settings", toggleGroup);
+		addButton(this, getTextLocale(App.getAppContext(), R.string.about_title), R.drawable.about_icon, R.drawable.about_icon_on, R.drawable.about_icon_light, "About", toggleGroup);
 
 		button_close.setOnClickListener(_view -> {
 			showMessageBoxUnsavedChanges();
@@ -156,10 +117,6 @@ public class SettingsActivity extends AppCompatActivity {
 	}
 
 	private void initializeLogic() {
-		AstyleButtonBTeal1(button_save);
-		AstyleButtonBlack1(button_close);
-		AstyleButtonBTeal1(button_saveandlaunch);
-
 		movePage("Flags Settings");
 	}
 
@@ -192,60 +149,18 @@ public class SettingsActivity extends AppCompatActivity {
 		return layoutParams;
 	}
 
-	public void addButton(Context context, String name, int IconResId, int IconResId1, int IconResId_light, String MovePageTo, LinearLayout parent) {
+	public void addButton(Context context, String name, int IconResId, int IconResId1, int IconResId_light, String MovePageTo, com.google.android.material.button.MaterialButtonToggleGroup parent) {
 		LayoutInflater inflater = LayoutInflater.from(context);
-		View buttonView = inflater.inflate(R.layout.button_menu_settingspage, parent, false);
+		com.google.android.material.button.MaterialButton buttonView = (com.google.android.material.button.MaterialButton) inflater.inflate(R.layout.button_menu_settingspage, parent, false);
 
-		LinearLayout container = buttonView.findViewById(R.id.button_option);
-		TextView nameView = buttonView.findViewById(R.id.textview_name);
-		ImageView imageView = buttonView.findViewById(R.id.imageview);
-
-		imageView.setBackgroundResource(IconResId);
-
-		nameView.setText(name);
-		container.setOnClickListener(v -> {
+		buttonView.setText(name);
+		buttonView.setIconResource(IconResId);
+		buttonView.setOnClickListener(v -> {
 			movePage(MovePageTo);
 		});
 
-		if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "light")) {
-			nameView.setTextColor(Color.parseColor("#000000"));
-			imageView.setBackgroundResource(IconResId_light);
-		} else if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "dark")) {
-			nameView.setTextColor(Color.parseColor("#FFFFFF"));
-			imageView.setBackgroundResource(IconResId);
-		}
-
-		AstyleButtonTRANSPARENT(container);
 		buttonClickListener.add(query -> {
-			if (!Objects.equals(query, MovePageTo)) {
-				AstyleButtonTRANSPARENT(container);
-				nameView.setVisibility(View.VISIBLE);
-
-				if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "light")) {
-					nameView.setTextColor(Color.parseColor("#000000"));
-					imageView.setBackgroundResource(IconResId_light);
-				} else if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "dark")) {
-					nameView.setTextColor(Color.parseColor("#FFFFFF"));
-					imageView.setBackgroundResource(IconResId);
-				}
-
-				container.setPadding(0, 15, 0, 15);
-			} else {
-				nameView.setVisibility(View.GONE);
-				GradientDrawable activeBg = new GradientDrawable();
-				activeBg.setCornerRadius(20);
-				activeBg.setStroke(0, Color.TRANSPARENT);
-
-				if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "dark")) {
-					activeBg.setColor(Color.parseColor("#151515"));
-				} else if (Objects.equals(App.getConfig().getSettingValue("app_theme_in_app"), "light")) {
-					activeBg.setColor(Color.parseColor("#FFFFFF"));
-				}
-
-				imageView.setBackgroundResource(IconResId1);
-				container.setBackground(activeBg);
-				container.setPadding(0, 53, 0, 53);
-			}
+			buttonView.setChecked(Objects.equals(query, MovePageTo));
 		});
 
 		parent.addView(buttonView);
@@ -302,8 +217,8 @@ public class SettingsActivity extends AppCompatActivity {
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.linear20, fragment)
 					.commit();
-			fadeIn(linear20);
-			animateTranslationY(linear20);
+			fadeIn(findViewById(R.id.linear20));
+			animateTranslationY(findViewById(R.id.linear20));
 		}
 	}
 
@@ -392,26 +307,6 @@ public class SettingsActivity extends AppCompatActivity {
 		}
 	}
 
-	public void AstyleButtonBTeal1(LinearLayout button) {
-		GradientDrawable drawable = new GradientDrawable();
-		drawable.setCornerRadius(30);
-		drawable.setColor(Color.parseColor("#38A181"));
-		button.setBackground(drawable);
-	}
-
-	public void AstyleButtonBlack1(LinearLayout button) {
-		GradientDrawable drawable = new GradientDrawable();
-		drawable.setCornerRadius(30);
-		drawable.setColor(Color.parseColor("#1B1B1B"));
-		button.setBackground(drawable);
-	}
-
-	public void AstyleButtonTRANSPARENT(LinearLayout button) {
-		GradientDrawable drawable = new GradientDrawable();
-		drawable.setCornerRadius(5);
-		drawable.setColor(Color.TRANSPARENT);
-		button.setBackground(drawable);
-	}
 
 	private static String getTextLocale(Context context, int resId) {
 		return context.getString(resId);
