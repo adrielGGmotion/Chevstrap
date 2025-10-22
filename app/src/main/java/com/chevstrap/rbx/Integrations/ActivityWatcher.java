@@ -5,7 +5,6 @@ import android.content.Context;
 import com.chevstrap.rbx.App;
 import com.chevstrap.rbx.ExtraPaths;
 
-import com.chevstrap.rbx.UI.NotifyIconWrapper;
 import com.chevstrap.rbx.Utility.FileTool;
 
 import java.io.BufferedReader;
@@ -99,7 +98,6 @@ public class ActivityWatcher {
                     reader.close();
                 } catch (IOException ignored) {}
             }
-            NotifyIconWrapper.hideConnectionNotification(context);
         }
     }
 
@@ -109,9 +107,7 @@ public class ActivityWatcher {
         final String joinGameStr = "[FLog::Output] ! Joining game";
         final String connectionStr = "Info [DFLog::NetworkClient] Connection accepted from";
 
-        if (line.contains("[FLog::Network] NetworkClient:Remove")) {
-            NotifyIconWrapper.hideConnectionNotification(context);
-        } else if (line.contains(joinGameStr)) {
+        if (line.contains(joinGameStr)) {
             int placeIdStart = line.indexOf("place ") + 6;
             int placeIdEnd = line.indexOf(" at", placeIdStart);
             int jobIdStart = line.indexOf("'") + 1;
@@ -135,7 +131,6 @@ public class ActivityWatcher {
             if (ipSplit.length >= 2) {
                 String location = ipSplit[0];
                 App.getLogger().writeLine(LOG_IDENT, "Connection string: " + line);
-                NotifyIconWrapper.showConnectionNotification(App.getAppContext(), location);
             } else {
                 App.getLogger().writeLine(LOG_IDENT, "Connection string did not contain expected IP format: " + lastPart);
             }
@@ -147,6 +142,5 @@ public class ActivityWatcher {
         stopMonitoring = true;
 
         App.getLogger().writeLine(LOG_IDENT, "Disposed activity watcher session");
-        NotifyIconWrapper.hideConnectionNotification(context);
     }
 }

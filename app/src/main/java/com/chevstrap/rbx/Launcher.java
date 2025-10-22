@@ -10,13 +10,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Xml;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentManager;
-
 import com.chevstrap.rbx.Integrations.ActivityWatcher;
-import com.chevstrap.rbx.UI.Elements.CustomDialogs.LoadingFragment;
-import com.chevstrap.rbx.UI.Frontend;
-import com.chevstrap.rbx.UI.ViewModels.GlobalViewModel;
 import com.chevstrap.rbx.Utility.FileTool;
 
 import org.json.JSONObject;
@@ -33,17 +27,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class Launcher {
-    private FragmentManager fragmentManager;
-    private volatile boolean isCancelled = false;
     private String packageName;
     private ActivityWatcher watcher;
 
     private static String getTextLocale(Context context, int resId) {
         return context.getString(resId);
-    }
-
-    public void setFragmentManager(FragmentManager fragmentManager) {
-        this.fragmentManager = fragmentManager;
     }
 
     public void Run() {
@@ -115,146 +103,45 @@ public class Launcher {
 
     public void StartRoblox() {
         Context context = App.getAppContext();
-        if (context == null || fragmentManager == null) {
-            throw new IllegalStateException("Context or FragmentManager not set.");
+        if (context == null) {
+            throw new IllegalStateException("Context not set.");
         }
 
         this.packageName = App.getPackageTarget(context);
-        isCancelled = false;
-
-        LoadingFragment fragment = createLoadingDialog();
-        fragment.setCancelable(false);
-
-        Handler handler = new Handler(Looper.getMainLooper());
-
-        handler.post(() -> {
-            fragment.setMessageText(getTextLocale(App.getAppContext(), R.string.bootstrapper_status_connecting));
-            fragment.setMessageStatus("0%");
-            try {
-                fragment.show(fragmentManager, "Messagebox");
-            } catch (IllegalStateException ignored) {
-            }
-        });
 
         if (IsRobloxModified(context)) {
-            handler.post(() -> Frontend.ShowMessageBox(App.getSavedFragmentActivity(),
-                    getTextLocale(App.getAppContext(), R.string.dialog_cheater_warning)));
-            isCancelled = true;
+            // TODO: Show a dialog
             return;
         }
 
-        animateProgress(fragment, 0, 50, () -> {
-            if (isCancelled) return;
-            handler.post(() -> fragment.setMessageText(
-                    getTextLocale(App.getAppContext(), R.string.bootstrapper_status_applying_modifications)));
+        try {
+            if (!ApplyChanges(context)) {
+                // TODO: Show a dialog
+                return;
+            }
+        } catch (Exception e) {
+            // TODO: Show a dialog
+            return;
+        }
 
-            animateProgress(fragment, 50, 70, () -> {
-                if (isCancelled) return;
+        App.setTempActivityWatcherClass(null);
 
-                boolean dontcancel;
-                try {
-                    dontcancel = ApplyChanges(context);
-                } catch (Exception e) {
-                    String LOG_IDENT = "Launcher::ApplyChanges";
-                    String reason = "Failed to apply FFlags";
-                    App.getLogger().writeLine(LOG_IDENT, reason);
-                    App.getLogger().writeException(LOG_IDENT, e);
-                    dontcancel = false;
-                }
+        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+        if (launchIntent != null) {
+            if (!(context instanceof Activity)) {
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
 
-                if (!dontcancel) {
-                    isCancelled = true;
-                    handler.post(() -> {
-                            if (fragment.isAdded()) fragment.dismissAllowingStateLoss();
-                            Frontend.ShowMessageBox(App.getSavedFragmentActivity(),
-                                getTextLocale(App.getAppContext(), R.string.dialog_failed_to_apply_changes));
-                    });
-                    return;
-                }
+            if (Boolean.parseBoolean(App.getConfig().getSettingValue("server_location_indicator_enabled"))) {
+                watcher = new ActivityWatcher(App.getAppContext());
+                watcher.runWatcher();
+                App.setTempActivityWatcherClass(watcher);
+            }
 
-                animateProgress(fragment, 70, 80, () -> {
-                    if (isCancelled) return;
-
-//                    if (Boolean.parseBoolean(App.getConfig().getSettingValue("clear_roblox_caches"))) {
-//                        handler.post(() -> {
-//                            if (Boolean.parseBoolean(App.getConfig().getSettingValue("clear_roblox_caches"))) {
-//                                fragment.setMessageText(getTextLocale(App.getAppContext(),
-//                                        R.string.bootstrapper_status_cleaning_caches_on_roblox));
-//                            }
-//                        });
-//                        clearRobloxCache(context);
-//                    }
-//
-//                    if (Boolean.parseBoolean(App.getConfig().getSettingValue("clear_roblox_logs"))) {
-//                        handler.post(() -> {
-//                            if (Boolean.parseBoolean(App.getConfig().getSettingValue("clear_roblox_logs"))) {
-//                                fragment.setMessageText(getTextLocale(App.getAppContext(),
-//                                        R.string.bootstrapper_status_cleaning_logs_on_roblox));
-//                            }
-//                        });
-//                        clearRobloxLogs(context);
-//                    }
-
-                    animateProgress(fragment, 80, 100, () -> {
-                        if (isCancelled) return;
-                        App.setTempActivityWatcherClass(null);
-
-                        String currentVersion = null;
-                        try {
-                            currentVersion = context.getPackageManager()
-                                    .getPackageInfo(context.getPackageName(), 0).versionName;
-                        } catch (Exception ignored) {
-                        }
-
-                        if (Boolean.parseBoolean(App.getConfig().getSettingValue("bring_update_chevstrap"))) {
-                            if (currentVersion != null &&
-                                    !App.getLatestVersion().equals(currentVersion) &&
-                                    !App.getLatestVersion().equals("no")) {
-                                handler.post(() -> fragment.setMessageText(
-                                        getTextLocale(App.getAppContext(), R.string.bootstrapper_status_upgrading_chevstrap)));
-
-                                try {
-                                    if (fragment.isAdded()) fragment.dismissAllowingStateLoss();
-                                } catch (Exception e) {
-                                    Frontend.ShowExceptionDialog(App.getSavedFragmentActivity(),
-                                            getTextLocale(App.getAppContext(), R.string.dialog_failed_to_launch), e);
-                                }
-                                GlobalViewModel.openWebpage(App.getAppContext(), ProjectDownloadLink);
-                            }
-                        } else {
-                            handler.post(() -> fragment.setMessageText("Starting Roblox"));
-                            Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
-                            if (launchIntent != null) {
-                                handler.post(() -> {
-                                    try {
-                                        if (fragment.isAdded()) fragment.dismissAllowingStateLoss();
-
-                                        if (!(context instanceof Activity)) {
-                                            launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        }
-
-                                        if (Boolean.parseBoolean(App.getConfig().getSettingValue("server_location_indicator_enabled"))) {
-                                            watcher = new ActivityWatcher(App.getAppContext());
-                                            watcher.runWatcher();
-                                            App.setTempActivityWatcherClass(watcher);
-                                        }
-
-                                        LaunchRoblox(context, launchIntent);
-                                    } catch (Exception e) {
-                                        Frontend.ShowExceptionDialog(App.getSavedFragmentActivity(), getTextLocale(App.getAppContext(), R.string.dialog_failed_to_launch), e);
-                                    }
-                                });
-                            } else {
-                                handler.post(() -> {
-                                    Frontend.ShowMessageBox(App.getSavedFragmentActivity(),
-                                            getTextLocale(App.getAppContext(), R.string.dialog_not_installed));
-                                });
-                            }
-                        }
-                    });
-                });
-            });
-        });
+            LaunchRoblox(context, launchIntent);
+        } else {
+            // TODO: Show a dialog
+        }
     }
 
 //    public void clearRobloxLogs(Context context) {
@@ -277,36 +164,9 @@ public class Launcher {
         try {
             context.startActivity(launchIntent);
         } catch (Exception e) {
-            Frontend.ShowPlayerErrorDialog(App.getSavedFragmentActivity(), e);
             App.getLogger().writeLine("Launcher::LaunchRoblox", "Failed to launch Roblox");
             App.getLogger().writeException("Launcher::LaunchRoblox", e);
         }
-    }
-
-    private void animateProgress(LoadingFragment fragment, int start, int end, Runnable onComplete) {
-        Handler handler = new Handler(Looper.getMainLooper());
-        int steps = 20;
-        int delay = 3500 / steps;
-        float increment = (float) (end - start) / steps;
-
-        final float[] progress = {start};
-
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                if (isCancelled) return;
-
-                if (progress[0] < end) {
-                    fragment.setMessageStatus(((int) progress[0]) + "%");
-                    progress[0] += increment;
-                    handler.postDelayed(this, delay);
-                } else {
-                    fragment.setMessageStatus(end + "%");
-                    if (onComplete != null) onComplete.run();
-                }
-            }
-        };
-        handler.post(runnable);
     }
 
     private boolean IsRobloxModified(Context context) {
@@ -325,18 +185,6 @@ public class Launcher {
             App.getLogger().writeException("Launcher::IsRobloxModified", e);
         }
         return false;
-    }
-
-    @NonNull
-    private LoadingFragment createLoadingDialog() {
-        LoadingFragment fragment = new LoadingFragment();
-        fragment.setMessageboxListener(() -> {
-            isCancelled = true;
-            if (fragment.isAdded() && fragmentManager != null) {
-                fragmentManager.beginTransaction().remove(fragment).commitAllowingStateLoss();
-            }
-        });
-        return fragment;
     }
 
 //    public static String setXmlSetting(String xml, String settingName, String newValue) {
